@@ -28,11 +28,11 @@ public class RepairService {
         RepairOrder order =
                 getOrder(orderId);
 
-        if (order.getStatus() ==
-                RepairStatus.COMPLETED) {
+        if (order.getStatus() == RepairStatus.COMPLETED
+                || order.getStatus() == RepairStatus.CANCELLED) {
 
             throw new IllegalStateException(
-                    "Нельзя начать уже завершённый ремонт"
+                    "Нельзя начать завершённый ремонт или отмененный ремонт"
             );
         }
 
@@ -69,6 +69,19 @@ public class RepairService {
         );
 
         repository.save(order);
+    }
+
+    public void cancelRepair(int orderId){
+
+        RepairOrder order = getOrder(orderId);
+
+        if (order.getStatus() != RepairStatus.CREATED){
+            throw  new IllegalStateException("Отменить можно только заказ, по которому ещё не начался ремонт");
+        }
+
+        order.setStatus(RepairStatus.CANCELLED);
+        repository.save(order);
+
     }
 
     public RepairOrder getOrder(int orderId) {

@@ -69,6 +69,45 @@ class RepairServiceTest {
         );
     }
 
+    @Test
+    void shouldCancelRepairBeforeItWasStarted() {
+
+        RepairService service = createService();
+
+        RepairOrder order = createOrder(1);
+
+        service.createOrder(order);
+
+        service.cancelRepair(1);
+
+        assertEquals(
+                RepairStatus.CANCELLED,
+                service.getOrder(1).getStatus()
+        );
+    }
+
+    @Test
+    void shouldNotStartCancelledRepair() {
+
+        RepairService service = createService();
+
+        RepairOrder order = createOrder(1);
+
+        service.createOrder(order);
+
+        service.cancelRepair(1);
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> service.startRepair(1)
+        );
+
+        assertEquals(
+                RepairStatus.CANCELLED,
+                service.getOrder(1).getStatus()
+        );
+    }
+
     private RepairService createService() {
 
         return new RepairService(
