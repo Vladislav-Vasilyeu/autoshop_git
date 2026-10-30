@@ -103,7 +103,7 @@ class RepairServiceTest {
         );
 
         assertEquals(
-                RepairStatus.COMPLETED,
+                RepairStatus.CANCELLED,
                 service.getOrder(1).getStatus()
         );
     }
