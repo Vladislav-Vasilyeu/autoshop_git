@@ -4,6 +4,7 @@ import by.ipprpo.autoshop_maven.model.Car;
 import by.ipprpo.autoshop_maven.model.Customer;
 import by.ipprpo.autoshop_maven.model.RepairOrder;
 import by.ipprpo.autoshop_maven.model.RepairStatus;
+import by.ipprpo.autoshop_maven.repository.RepairRepository;
 import by.ipprpo.autoshop_maven.repository.InMemoryRepairRepository;
 import org.junit.jupiter.api.Test;
 
@@ -105,6 +106,46 @@ class RepairServiceTest {
         assertEquals(
                 RepairStatus.CANCELLED,
                 service.getOrder(1).getStatus()
+        );
+    }
+
+    @Test
+    void shouldRejectNullOrder() {
+
+        RepairService service = createService();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.createOrder(null)
+        );
+    }
+
+    @Test
+    void shouldLogErrorWhenOrderSavingFails() {
+
+        RepairRepository failingRepository = new RepairRepository() {
+
+            @Override
+            public void save(RepairOrder order) {
+                throw new RuntimeException("Ошибка тестового сохранения");
+            }
+
+            @Override
+            public java.util.Optional<RepairOrder> findById(int id) {
+                return java.util.Optional.empty();
+            }
+
+            @Override
+            public java.util.List<RepairOrder> findAll() {
+                return java.util.Collections.emptyList();
+            }
+        };
+
+        RepairService service = new RepairService(failingRepository);
+
+        assertThrows(
+                RuntimeException.class,
+                () -> service.createOrder(createOrder(1))
         );
     }
 

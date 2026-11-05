@@ -3,9 +3,14 @@ package by.ipprpo.autoshop_maven.service;
 import by.ipprpo.autoshop_maven.model.RepairOrder;
 import by.ipprpo.autoshop_maven.model.RepairStatus;
 import by.ipprpo.autoshop_maven.repository.RepairRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class RepairService {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(RepairService.class);
     private final RepairRepository repository;
 
     /*
@@ -20,7 +25,20 @@ public class RepairService {
 
     public void createOrder(RepairOrder order) {
 
-        repository.save(order);
+        logger.info("Начало создания заказа на обслуживание автомобиля");
+
+        if (order == null) {
+            logger.warn("Попытка создания заказа с пустыми данными (null)");
+            throw new IllegalArgumentException("Заказ не может быть null");
+        }
+
+        try {
+            repository.save(order);
+            logger.info("Заказ успешно создан");
+        } catch (RuntimeException e) {
+            logger.error("Ошибка при создании заказа", e);
+            throw e;
+        }
     }
 
     public void startRepair(int orderId) {
