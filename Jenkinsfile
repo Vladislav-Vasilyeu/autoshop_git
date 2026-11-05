@@ -22,6 +22,13 @@ pipeline {
             }
         }
 
+        stage('Static Analysis') {
+            steps {
+                echo '=== STATIC ANALYSIS: Проверка Checkstyle ==='
+                bat 'mvn checkstyle:check'
+            }
+        }
+
         stage('Package') {
             steps {
                 echo '=== PACKAGE: Создание JAR ==='
